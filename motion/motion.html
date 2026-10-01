@@ -1,0 +1,1664 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flano — Motion Promo</title>
+    <style>
+      @import url("./tokens.css");
+
+      @font-face {
+        font-family: "Manrope";
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+        src: url("../website/fonts/manrope-400.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Manrope";
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+        src: url("../website/fonts/manrope-600.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Manrope";
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+        src: url("../website/fonts/manrope-700.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Manrope";
+        font-weight: 800;
+        font-style: normal;
+        font-display: swap;
+        src: url("../website/fonts/manrope-800.woff2") format("woff2");
+      }
+
+      :root {
+        --background: #0d0d0d;
+        --foreground: #f5f5f5;
+        --primary: #1f8a9e;
+        --primary-foreground: #ffffff;
+        --card: #161616;
+        --muted: #1e1e1e;
+        --muted-foreground: #a1a1a1;
+        --border: #262626;
+        --radius: 0.75rem;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        background: var(--background);
+        color: var(--foreground);
+        font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+
+      #stage {
+        position: relative;
+        width: 1280px;
+        height: 720px;
+        transform-origin: center center;
+        overflow: hidden;
+        background:
+          radial-gradient(900px 520px at 22% 8%, rgba(31, 138, 158, 0.18), transparent 62%),
+          radial-gradient(760px 480px at 84% 92%, rgba(31, 138, 158, 0.12), transparent 60%),
+          var(--background);
+        will-change: transform;
+      }
+
+      #stage::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        box-shadow: inset 0 0 220px rgba(0, 0, 0, 0.85);
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        opacity: 0;
+      }
+
+      .num {
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ---------- intro / outro ---------- */
+
+      .center {
+        display: grid;
+        justify-items: center;
+        text-align: center;
+      }
+
+      .logo {
+        width: 96px;
+        height: 96px;
+        border-radius: 22px;
+        object-fit: cover;
+        box-shadow: 0 24px 60px rgba(31, 138, 158, 0.35);
+      }
+
+      .logo-fallback {
+        width: 96px;
+        height: 96px;
+        border-radius: 22px;
+        background: linear-gradient(140deg, var(--primary), #0f5c6b);
+        box-shadow: 0 24px 60px rgba(31, 138, 158, 0.35);
+      }
+
+      .wordmark {
+        margin-top: 22px;
+        font-size: 76px;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        line-height: 1;
+      }
+
+      .mask {
+        overflow: hidden;
+        display: block;
+      }
+
+      .mask > span {
+        display: block;
+      }
+
+      .tagline {
+        margin-top: 16px;
+        font-size: 19px;
+        font-weight: 500;
+        color: var(--muted-foreground);
+        letter-spacing: 0.01em;
+      }
+
+      .tagline em {
+        font-style: normal;
+        color: var(--primary);
+      }
+
+      /* ---------- app shell ---------- */
+
+      .shell {
+        position: absolute;
+        inset: 0;
+        display: flex;
+      }
+
+      .side {
+        width: 240px;
+        flex: 0 0 240px;
+        border-right: 1px solid var(--border);
+        background: var(--card);
+        padding: 26px 0 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 20px 22px;
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .brand img,
+      .brand .logo-fallback {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        object-fit: cover;
+        box-shadow: none;
+      }
+
+      .brand .logo-fallback {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+      }
+
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding: 0 12px;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 9px 12px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--muted-foreground);
+        background: transparent;
+      }
+
+      .nav-item.on {
+        color: var(--primary);
+        background: rgba(31, 138, 158, 0.15);
+      }
+
+      .nav-item .ic {
+        width: 15px;
+        height: 15px;
+        border: 1.6px solid currentColor;
+        border-radius: 4px;
+        opacity: 0.85;
+      }
+
+      .nav-item .ic.round {
+        border-radius: 50%;
+      }
+
+      .side-foot {
+        margin-top: auto;
+        padding: 14px;
+      }
+
+      .widget {
+        border: 1px solid var(--border);
+        background: var(--background);
+        border-radius: 14px;
+        padding: 12px 14px;
+      }
+
+      .widget-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--muted-foreground);
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--primary);
+      }
+
+      .widget-time {
+        margin-top: 4px;
+        font-size: 21px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .widget-sub {
+        font-size: 11px;
+        color: var(--muted-foreground);
+        text-transform: capitalize;
+      }
+
+      .main {
+        flex: 1;
+        min-width: 0;
+        padding: 24px 34px 34px;
+        position: relative;
+      }
+
+      .page-head h2 {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .page-head p {
+        margin-top: 4px;
+        font-size: 13px;
+        color: var(--muted-foreground);
+      }
+
+      .panel {
+        position: absolute;
+        inset: 88px 34px 34px;
+        opacity: 0;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        background: var(--card);
+        border-radius: 16px;
+      }
+
+      .cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        height: 100%;
+        align-items: start;
+      }
+
+      /* ---------- timer card ---------- */
+
+      .timer-card {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        color: var(--muted-foreground);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        border: 1px solid rgba(31, 138, 158, 0.25);
+        background: rgba(31, 138, 158, 0.1);
+        color: var(--primary);
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .ring-wrap {
+        position: relative;
+        display: grid;
+        place-items: center;
+        margin: 4px 0 2px;
+      }
+
+      .ring {
+        width: 262px;
+        height: 262px;
+        transform: rotate(-90deg);
+        overflow: visible;
+      }
+
+      .ring circle {
+        fill: transparent;
+        stroke-width: 12;
+      }
+
+      .ring-track {
+        stroke: rgba(30, 30, 30, 0.85);
+      }
+
+      .ring-prog {
+        stroke: var(--primary);
+        stroke-linecap: round;
+      }
+
+      .ring-glow {
+        position: absolute;
+        width: 210px;
+        height: 210px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(31, 138, 158, 0.28), transparent 68%);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .ring-center {
+        position: absolute;
+        text-align: center;
+      }
+
+      .clock {
+        font-size: 50px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1;
+      }
+
+      .clock-label {
+        margin-top: 7px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted-foreground);
+      }
+
+      .task-chip {
+        display: inline-block;
+        max-width: 190px;
+        margin-top: 9px;
+        padding: 2px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(31, 138, 158, 0.22);
+        background: rgba(31, 138, 158, 0.1);
+        color: var(--primary);
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .metric {
+        border: 1px solid var(--border);
+        background: var(--background);
+        border-radius: 12px;
+        padding: 11px 13px;
+      }
+
+      .metric .lbl {
+        font-size: 11px;
+        color: var(--muted-foreground);
+      }
+
+      .metric .val {
+        margin-top: 3px;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .metric .sub {
+        margin-top: 1px;
+        font-size: 10px;
+        color: var(--muted-foreground);
+      }
+
+      .goal {
+        border: 1px solid var(--border);
+        background: var(--background);
+        border-radius: 12px;
+        padding: 12px 13px;
+      }
+
+      .goal-top {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--muted-foreground);
+      }
+
+      .goal-top strong {
+        color: var(--foreground);
+        font-weight: 600;
+      }
+
+      .bar {
+        margin-top: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(30, 30, 30, 0.9);
+        overflow: hidden;
+      }
+
+      .bar > i {
+        display: block;
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: var(--primary);
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 42px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        background: var(--primary);
+        color: var(--primary-foreground);
+      }
+
+      .btn .tri {
+        width: 0;
+        height: 0;
+        border-left: 8px solid currentColor;
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+      }
+
+      .btn .pause-ic {
+        display: none;
+        width: 9px;
+        height: 11px;
+        border-left: 3px solid currentColor;
+        border-right: 3px solid currentColor;
+      }
+
+      .btn.paused .tri {
+        display: none;
+      }
+
+      .btn.paused .pause-ic {
+        display: block;
+      }
+
+      /* ---------- today list ---------- */
+
+      .list-card {
+        padding: 20px 20px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: 100%;
+      }
+
+      .list-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .list-title span {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--muted-foreground);
+      }
+
+      .row {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 11px 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--background);
+      }
+
+      .check {
+        position: relative;
+        width: 17px;
+        height: 17px;
+        flex: 0 0 17px;
+        border-radius: 6px;
+        border: 1.5px solid var(--border);
+        background: transparent;
+      }
+
+      .check svg {
+        position: absolute;
+        inset: 1px;
+        width: 13px;
+        height: 13px;
+        opacity: 0;
+      }
+
+      .row.done .check {
+        border-color: transparent;
+        background: var(--primary);
+      }
+
+      .row-text {
+        flex: 1;
+        min-width: 0;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .strike {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 1.5px;
+        background: var(--muted-foreground);
+        transform: scaleX(0);
+        transform-origin: left center;
+      }
+
+      .row.done .row-text {
+        color: var(--muted-foreground);
+      }
+
+      .tag {
+        flex: 0 0 auto;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--primary);
+        background: rgba(31, 138, 158, 0.12);
+      }
+
+      .tag.dim {
+        color: #c4a24a;
+        background: rgba(196, 162, 74, 0.12);
+      }
+
+      .tag.violet {
+        color: #a78bfa;
+        background: rgba(167, 139, 250, 0.12);
+      }
+
+      .empty {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px dashed var(--border);
+        border-radius: 12px;
+        padding: 12px 13px;
+        font-size: 12px;
+        color: var(--muted-foreground);
+      }
+
+      .empty .plus {
+        width: 16px;
+        height: 16px;
+        border-radius: 5px;
+        border: 1.5px solid var(--primary);
+        position: relative;
+      }
+
+      .empty .plus::before,
+      .empty .plus::after {
+        content: "";
+        position: absolute;
+        background: var(--primary);
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .empty .plus::before {
+        width: 7px;
+        height: 1.5px;
+      }
+
+      .empty .plus::after {
+        width: 1.5px;
+        height: 7px;
+      }
+
+      /* ---------- stats ---------- */
+
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        height: 100%;
+      }
+
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+      }
+
+      .kpi {
+        padding: 14px 15px;
+      }
+
+      .kpi .lbl {
+        font-size: 11px;
+        color: var(--muted-foreground);
+      }
+
+      .kpi .val {
+        margin-top: 7px;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+      }
+
+      .kpi .sub {
+        margin-top: 3px;
+        font-size: 10.5px;
+        color: var(--muted-foreground);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .up {
+        color: #34d399;
+        font-weight: 600;
+      }
+
+      .chart-card {
+        padding: 16px 18px 14px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .chart-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(38, 38, 38, 0.7);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .chart-head em {
+        font-style: normal;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: var(--primary);
+      }
+
+      .chart-head .rng {
+        display: flex;
+        gap: 4px;
+        font-size: 10.5px;
+      }
+
+      .rng i {
+        font-style: normal;
+        padding: 3px 9px;
+        border-radius: 7px;
+        color: var(--muted-foreground);
+        border: 1px solid var(--border);
+      }
+
+      .rng i.on {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .chart {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding-top: 12px;
+      }
+
+      .chart-vals {
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        height: 16px;
+        margin-bottom: 6px;
+      }
+
+      .chart-vals span {
+        flex: 1;
+        text-align: center;
+        font-size: 10px;
+        color: var(--muted-foreground);
+        opacity: 0.75;
+      }
+
+      .bars {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        min-height: 150px;
+      }
+
+      .bars > div.col {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        height: 100%;
+      }
+
+      .bars i {
+        display: block;
+        width: 100%;
+        max-width: 34px;
+        height: 0%;
+        border-radius: 8px 8px 0 0;
+        background: rgba(31, 138, 158, 0.4);
+        transform-origin: bottom center;
+      }
+
+      .bars > div.col.today > i {
+        background: var(--primary);
+        box-shadow: 0 8px 22px rgba(31, 138, 158, 0.3);
+      }
+
+      .bars > div.avg {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: auto;
+        display: block;
+        flex: none;
+        justify-content: flex-start;
+        align-items: flex-start;
+      }
+
+      .avg i {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        display: block;
+        height: 0;
+        width: 100%;
+        max-width: none;
+        border-radius: 0;
+        background: none;
+        border-top: 2px dashed rgba(31, 138, 158, 0.45);
+        transform: scaleX(0);
+        transform-origin: left center;
+      }
+
+      .avg b {
+        position: absolute;
+        right: 0;
+        top: -11px;
+        padding: 1px 6px;
+        border-radius: 5px;
+        border: 1px solid rgba(31, 138, 158, 0.3);
+        background: var(--card);
+        color: var(--primary);
+        font-size: 9.5px;
+        font-weight: 700;
+      }
+
+      .chart-days {
+        display: flex;
+        gap: 12px;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(38, 38, 38, 0.55);
+      }
+
+      .chart-days span {
+        flex: 1;
+        text-align: center;
+        font-size: 10.5px;
+        color: var(--foreground);
+        opacity: 0.8;
+      }
+
+      .chart-days span b {
+        display: block;
+        font-weight: 500;
+        font-size: 9.5px;
+        color: var(--muted-foreground);
+      }
+
+      .streak {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px 14px;
+        background: var(--background);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .streak .flame {
+        width: 15px;
+        height: 15px;
+        border-radius: 50% 50% 50% 4px;
+        transform: rotate(-45deg);
+        background: linear-gradient(160deg, #fb923c, #ef4444);
+      }
+
+      .streak em {
+        font-style: normal;
+        margin-left: auto;
+        font-size: 10.5px;
+        font-weight: 500;
+        color: var(--muted-foreground);
+      }
+
+      /* ---------- chrome ---------- */
+
+      #progress {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        background: rgba(38, 38, 38, 0.6);
+      }
+
+      #progress > i {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, rgba(31, 138, 158, 0.35), var(--primary));
+      }
+
+      #hud {
+        position: fixed;
+        right: 18px;
+        bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 20;
+      }
+
+      #dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      #dots button {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        background: #2e2e2e;
+        transition: background 0.25s ease, transform 0.25s ease;
+      }
+
+      #dots button.on {
+        background: var(--primary);
+        transform: scale(1.4);
+      }
+
+      #hud .ctl {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgba(22, 22, 22, 0.9);
+        padding: 4px 6px;
+      }
+
+      #hud button.act {
+        width: 26px;
+        height: 26px;
+        display: grid;
+        place-items: center;
+        border: none;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--muted-foreground);
+        cursor: pointer;
+      }
+
+      #hud button.act:hover {
+        background: var(--muted);
+        color: var(--foreground);
+      }
+
+      #hud svg {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
+      }
+
+      #hint {
+        position: fixed;
+        left: 18px;
+        bottom: 16px;
+        z-index: 20;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #3a3a3a;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="stage">
+      <!-- 1. INTRO -->
+      <div class="scene" id="s-intro">
+        <div class="center">
+          <img class="logo" src="../app/public/logo.jpg" alt="Flano" />
+          <h1 class="wordmark mask"><span>Flano</span></h1>
+          <p class="tagline">Offline Pomodoro <em>&amp;</em> Today</p>
+        </div>
+      </div>
+
+      <!-- 2/3/4. APP SHELL -->
+      <div class="scene" id="s-app">
+        <div class="shell">
+          <aside class="side">
+            <div class="brand">
+              <img class="lg" src="../app/public/logo.jpg" alt="" />
+              <span>Flano</span>
+            </div>
+            <nav class="nav">
+              <div class="nav-item on" data-nav="0">
+                <span class="ic round"></span>Timer
+              </div>
+              <div class="nav-item" data-nav="1"><span class="ic"></span>Projects</div>
+              <div class="nav-item" data-nav="2"><span class="ic"></span>Calendar</div>
+              <div class="nav-item" data-nav="3"><span class="ic"></span>Stats</div>
+              <div class="nav-item" data-nav="4"><span class="ic"></span>Settings</div>
+            </nav>
+            <div class="side-foot">
+              <div class="widget">
+                <div class="widget-top">
+                  <span id="side-kind">Work</span>
+                  <span class="dot" id="side-dot"></span>
+                </div>
+                <div class="widget-time num" id="side-time">25:00</div>
+                <div class="widget-sub" id="side-state">ready</div>
+              </div>
+            </div>
+          </aside>
+
+          <div class="main">
+            <div class="page-head">
+              <h2 id="page-title">Focus</h2>
+              <p id="page-desc">Work in focused pomodoros, then recharge with short and long breaks.</p>
+            </div>
+
+            <!-- TIMER PANEL -->
+            <div class="panel" id="p-timer">
+              <div class="cols">
+                <section class="card timer-card">
+                  <div class="card-head">
+                    <span class="pill">1 cycle = 25m</span>
+                    <span class="streak-inline" style="display: flex; align-items: center; gap: 5px; font-size: 12px">
+                      <span
+                        class="flame"
+                        style="
+                          width: 12px;
+                          height: 12px;
+                          border-radius: 50% 50% 50% 3px;
+                          transform: rotate(-45deg);
+                          background: linear-gradient(160deg, #fb923c, #ef4444);
+                        "
+                      ></span>
+                      Streak: <strong class="num" id="card-streak">4</strong>
+                    </span>
+                  </div>
+
+                  <div class="ring-wrap">
+                    <div class="ring-glow"></div>
+                    <svg class="ring" viewBox="0 0 200 200">
+                      <circle class="ring-track" cx="100" cy="100" r="88" />
+                      <circle class="ring-prog" cx="100" cy="100" r="88" />
+                    </svg>
+                    <div class="ring-center">
+                      <div class="clock num" id="clock">25:00</div>
+                      <div class="clock-label" id="clock-label">Focus</div>
+                      <span class="task-chip">Write project notes</span>
+                    </div>
+                  </div>
+
+                  <div class="metrics">
+                    <div class="metric">
+                      <div class="lbl">Cycles today</div>
+                      <div class="val num" id="m-cycles">0</div>
+                      <div class="sub num" id="m-worked">0m worked</div>
+                    </div>
+                    <div class="metric">
+                      <div class="lbl">Yesterday</div>
+                      <div class="val num">2h 45m</div>
+                      <div class="sub">total work</div>
+                    </div>
+                  </div>
+
+                  <div class="goal">
+                    <div class="goal-top">
+                      <span>Total working today: <strong class="num" id="g-worked">0m</strong></span>
+                      <span>Target: <strong>4h</strong> (240m)</span>
+                    </div>
+                    <div class="bar"><i id="g-fill"></i></div>
+                  </div>
+
+                  <div class="actions">
+                    <div class="btn" id="btn-main">
+                      <span class="tri"></span><span class="pause-ic"></span>
+                      <span id="btn-label">Start Focus</span>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="card list-card">
+                  <div class="list-title">Today <span>3 tasks Â· 1h 50m est</span></div>
+                  <div class="row" data-row="0">
+                    <span class="check">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8.5 6.5 12 13 4.5" />
+                      </svg>
+                    </span>
+                    <span class="row-text">Write project notes<span class="strike"></span></span>
+                    <span class="tag">Flano</span>
+                  </div>
+                  <div class="row" data-row="1">
+                    <span class="check">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8.5 6.5 12 13 4.5" />
+                      </svg>
+                    </span>
+                    <span class="row-text">Review API docs<span class="strike"></span></span>
+                    <span class="tag dim">Side</span>
+                  </div>
+                  <div class="row" data-row="2">
+                    <span class="check">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8.5 6.5 12 13 4.5" />
+                      </svg>
+                    </span>
+                    <span class="row-text">Fix chart tooltip bug<span class="strike"></span></span>
+                    <span class="tag violet">Work</span>
+                  </div>
+                  <div class="empty"><span class="plus"></span>Add today's next task”¦</div>
+                </section>
+              </div>
+            </div>
+
+            <!-- TODAY PANEL -->
+            <div class="panel" id="p-today">
+              <div class="cols">
+                <section class="card list-card" style="grid-column: 1 / 2">
+                  <div class="list-title">Today <span>4 tasks Â· 1h 50m est</span></div>
+                  <div class="row" data-row="3">
+                    <span class="check">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8.5 6.5 12 13 4.5" />
+                      </svg>
+                    </span>
+                    <span class="row-text">Write project notes<span class="strike"></span></span>
+                    <span class="tag">Flano</span>
+                  </div>
+                  <div class="row" data-row="4">
+                    <span class="check">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8.5 6.5 12 13 4.5" />
+                      </svg>
+                    </span>
+                    <span class="row-text">Review API docs<span class="strike"></span></span>
+                    <span class="tag dim">Side</span>
+                  </div>
+                  <div class="row" data-row="5">
+                    <span class="check">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8.5 6.5 12 13 4.5" />
+                      </svg>
+                    </span>
+                    <span class="row-text">Fix chart tooltip bug<span class="strike"></span></span>
+                    <span class="tag violet">Work</span>
+                  </div>
+                  <div class="row" data-row="6">
+                    <span class="check">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8.5 6.5 12 13 4.5" />
+                      </svg>
+                    </span>
+                    <span class="row-text">Plan next sprint<span class="strike"></span></span>
+                    <span class="tag violet">Work</span>
+                  </div>
+                  <div class="empty"><span class="plus"></span>Add today's next task”¦</div>
+                </section>
+
+                <section class="card list-card">
+                  <div class="list-title">Scheduled <span>2 upcoming</span></div>
+                  <div class="row">
+                    <span class="check">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8.5 6.5 12 13 4.5" />
+                      </svg>
+                    </span>
+                    <span class="row-text">Invoice follow-ups</span>
+                    <span class="tag dim">Admin</span>
+                  </div>
+                  <div class="row">
+                    <span class="check">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 8.5 6.5 12 13 4.5" />
+                      </svg>
+                    </span>
+                    <span class="row-text">Renew design licences</span>
+                    <span class="tag">Flano</span>
+                  </div>
+                  <div class="empty"><span class="plus"></span>Drag from projects to schedule</div>
+                </section>
+              </div>
+            </div>
+
+            <!-- STATS PANEL -->
+            <div class="panel" id="p-stats">
+              <div class="stack">
+                <div class="kpis">
+                  <div class="card kpi">
+                    <div class="lbl">Total Time Worked</div>
+                    <div class="val num" id="k-total">0m</div>
+                    <div class="sub"><span class="up">+45m (+18%)</span> vs prev 7d</div>
+                  </div>
+                  <div class="card kpi">
+                    <div class="lbl">Daily Average</div>
+                    <div class="val num" id="k-avg">0m</div>
+                    <div class="sub">Target: 4h 00m / day</div>
+                  </div>
+                  <div class="card kpi">
+                    <div class="lbl">Cycles Completed</div>
+                    <div class="val num" id="k-cycles">0</div>
+                    <div class="sub">38 in last 7d Â· 1 today</div>
+                  </div>
+                  <div class="card kpi">
+                    <div class="lbl">Longest Streak</div>
+                    <div class="val num" id="k-streak">0 days</div>
+                    <div class="sub">4-day streak is live</div>
+                  </div>
+                </div>
+
+                <div class="card chart-card">
+                  <div class="chart-head">
+                    <span><em>â—</em> Hours &amp; Minutes Worked</span>
+                    <span class="rng"><i class="on">7d</i><i>14d</i></span>
+                  </div>
+                  <div class="chart">
+                    <div class="chart-vals" id="chart-vals"></div>
+                    <div class="bars" id="bars">
+                      <div class="avg" id="avg"><i></i><b id="avg-label">Avg</b></div>
+                    </div>
+                    <div class="chart-days" id="chart-days"></div>
+                  </div>
+                </div>
+
+                <div class="streak">
+                  <span class="flame"></span>
+                  Streak: <span class="num" id="k-streak2">4</span> days
+                  <em>Keep 2h 00m more to extend</em>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. OUTRO -->
+      <div class="scene" id="s-outro">
+        <div class="center">
+          <img class="logo" src="../app/public/logo.jpg" alt="Flano" />
+          <h1 class="wordmark mask" style="font-size: 62px"><span>Focus. Offline. Yours.</span></h1>
+          <p class="tagline">No account, no cloud, <em>just deep work</em></p>
+        </div>
+      </div>
+
+      <div id="progress"><i></i></div>
+    </div>
+
+    <div id="hint">Flano — motion promo</div>
+
+    <div id="hud">
+      <div id="dots"></div>
+      <div class="ctl">
+        <button class="act" id="replay" title="Replay">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"
+            />
+          </svg>
+        </button>
+        <button class="act" id="toggle" title="Play / Pause">
+          <svg viewBox="0 0 24 24" id="toggle-icon"><path d="M7 4h4v16H7zM13 4h4v16h-4z" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+      const $ = (s, r = document) => r.querySelector(s);
+      const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+      // --- stage scaling -----------------------------------------------------
+      const stage = $("#stage");
+      function fit() {
+        const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+        stage.style.transform = `scale(${s})`;
+      }
+      window.addEventListener("resize", fit);
+      fit();
+
+      // --- logo fallback (works when opened from the filesystem) -------------
+      $$("img.logo, img.lg").forEach((img) => {
+        img.addEventListener("error", () => {
+          const d = document.createElement("div");
+          d.className = "logo-fallback";
+          img.replaceWith(d);
+        });
+      });
+
+      // --- chart data --------------------------------------------------------
+      const MAX_MIN = 300;
+      const DATA = [180, 240, 95, 300, 150, 270, 205];
+      const days = [];
+      const fmtShort = new Intl.DateTimeFormat("en", { weekday: "short" });
+      const fmtNum = new Intl.DateTimeFormat("en", { day: "numeric" });
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(Date.now() - i * 86400000);
+        days.push({ name: fmtShort.format(d), date: fmtNum.format(d) });
+      }
+      const totalMin = DATA.reduce((a, b) => a + b, 0);
+      const avgMin = Math.round(totalMin / DATA.length);
+      const fmtHM = (m) => (m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`);
+
+      const barsEl = $("#bars");
+      const avgEl = $("#avg");
+      DATA.forEach((min, i) => {
+        const wrap = document.createElement("div");
+        wrap.className = i === DATA.length - 1 ? "col today" : "col";
+        const bar = document.createElement("i");
+        bar.style.height = `${(min / MAX_MIN) * 100}%`;
+        wrap.appendChild(bar);
+        barsEl.insertBefore(wrap, avgEl);
+
+        const v = document.createElement("span");
+        v.textContent = fmtHM(min);
+        $("#chart-vals").appendChild(v);
+
+        const d = document.createElement("span");
+        d.innerHTML = `${days[i].name}<b>${days[i].date}</b>`;
+        $("#chart-days").appendChild(d);
+      });
+      avgEl.style.bottom = `${(avgMin / MAX_MIN) * 100}%`;
+
+      // --- nav dots ----------------------------------------------------------
+      const SCENES = ["intro", "timer", "today", "stats", "outro"];
+      const dotWrap = $("#dots");
+      SCENES.forEach((s, i) => {
+        const b = document.createElement("button");
+        b.title = s;
+        b.addEventListener("click", () => {
+          tl.seek(tl.labels[s] ?? 0);
+          if (tl.paused()) tl.play();
+        });
+        dotWrap.appendChild(b);
+      });
+      const dots = $$("#dots button");
+
+      // --- helpers -----------------------------------------------------------
+      const fmtClock = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+      const C = 2 * Math.PI * 88;
+      gsap.set(".ring-prog", { strokeDasharray: C, strokeDashoffset: C });
+      gsap.set(".scene", { opacity: 0 });
+      gsap.set("#s-intro", { opacity: 1 });
+      gsap.set(".wordmark span", { yPercent: 110 });
+
+      const clock = { s: 1500 };
+      function paintClock() {
+        const txt = fmtClock(clock.s);
+        $("#clock").textContent = txt;
+        $("#side-time").textContent = txt;
+      }
+      paintClock();
+
+      function setRing(p) {
+        gsap.set(".ring-prog", { strokeDashoffset: C * (1 - p) });
+      }
+
+      const navItems = $$("[data-nav]");
+      function navOn(i) {
+        navItems.forEach((n, k) => n.classList.toggle("on", k === i));
+      }
+
+      function resetState() {
+        clock.s = 1500;
+        paintClock();
+        setRing(0);
+        gsap.set("#m-cycles", { innerText: 0 });
+        gsap.set("#m-worked", { innerText: "0m worked" });
+        gsap.set("#g-worked", { innerText: "0m" });
+        gsap.set("#g-fill", { width: "0%" });
+        gsap.set("#k-total", { innerText: "0m" });
+        gsap.set("#k-avg", { innerText: "0m" });
+        gsap.set("#k-cycles", { innerText: 0 });
+        gsap.set("#k-streak", { innerText: "0 days" });
+        gsap.set("#k-streak2", { innerText: 0 });
+        gsap.set("#card-streak", { innerText: 0 });
+        gsap.set("#avg i", { scaleX: 0 });
+        gsap.set("#avg-label", { innerText: "Avg" });
+        gsap.set(".bars .col > i", { scaleY: 0 });
+        gsap.set("#btn-label", { innerText: "Start Focus" });
+        gsap.set("#side-kind", { innerText: "Work" });
+        gsap.set("#side-state", { innerText: "ready" });
+        gsap.set("#clock-label", { innerText: "Focus" });
+        gsap.set(".ring-glow", { opacity: 0 });
+        gsap.set(".check svg", { opacity: 0 });
+        gsap.set(".strike", { scaleX: 0 });
+        gsap.set(".row", { opacity: 1 });
+        $$(".row").forEach((r) => r.classList.remove("done"));
+        setPaused(false);
+        navOn(0);
+        $("#page-title").textContent = "Focus";
+        $("#page-desc").textContent =
+          "Work in focused pomodoros, then recharge with short and long breaks.";
+        setDot("#1f8a9e");
+        gsap.set(".side-foot .widget", { borderColor: "#262626" });
+      }
+
+      function setPaused(on) {
+        const btn = $("#btn-main");
+        btn.classList.toggle("paused", on);
+        gsap.set(btn, { backgroundColor: on ? "#f59e0b" : "#1f8a9e", color: on ? "#000000" : "#ffffff" });
+        setDot(on ? "#f59e0b" : "#1f8a9e");
+      }
+
+      function setDot(color) {
+        gsap.to("#side-dot", { backgroundColor: color, duration: 0.3, overwrite: "auto" });
+      }
+
+      // --- master timeline ---------------------------------------------------
+      const tl = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 1,
+        defaults: { ease: "power3.out" },
+        onUpdate: syncHUD,
+        onRepeat: resetState,
+      });
+
+      function syncHUD() {
+        $("#progress > i").style.width = `${tl.progress() * 100}%`;
+        const t = tl.time();
+        let active = 0;
+        SCENES.forEach((s, i) => {
+          if (t >= (tl.labels[s] ?? 0)) active = i;
+        });
+        dots.forEach((d, i) => d.classList.toggle("on", i === active));
+      }
+
+      /* ---- SCENE 1: intro ---- */
+      tl.addLabel("intro", 0);
+      tl.from("#s-intro .logo", { scale: 0.6, opacity: 0, filter: "blur(14px)", duration: 0.9 }, 0);
+      tl.to("#s-intro .wordmark span", { yPercent: 0, duration: 0.8, ease: "power4.out" }, 0.35);
+      tl.from("#s-intro .tagline", { y: 14, opacity: 0, duration: 0.6 }, 0.75);
+      tl.to("#s-intro", { scale: 1.12, opacity: 0, filter: "blur(10px)", duration: 0.6, ease: "power2.in" }, 1.9);
+
+      /* ---- SCENE 2: timer ---- */
+      tl.addLabel("timer", 2.5);
+      tl.to("#s-intro", { opacity: 0, duration: 0.01 }, 2.5);
+      tl.fromTo("#s-app", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "none" }, 2.5);
+      tl.from(".side", { x: -50, opacity: 0, duration: 0.7, ease: "power3.out" }, 2.5);
+      tl.from(".page-head", { y: -18, opacity: 0, duration: 0.6 }, 2.6);
+      tl.from(".nav-item", { x: -16, opacity: 0, duration: 0.5, stagger: 0.06 }, 2.7);
+      tl.from(".side-foot", { y: 20, opacity: 0, duration: 0.5 }, 2.9);
+      tl.call(navOn, [0], 2.72);
+      tl.fromTo("#p-timer", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.7 }, 2.85);
+      tl.from("#p-timer .card", { scale: 0.97, opacity: 0, duration: 0.7, stagger: 0.1 }, 2.9);
+
+      // clock + ring run together off one driver
+      const run = { p: 0 };
+      tl.to(
+        run,
+        {
+          p: 0.62,
+          duration: 3,
+          ease: "none",
+          onUpdate() {
+            clock.s = 1500 - run.p * 1500 * 0.108;
+            paintClock();
+            setRing(run.p);
+          },
+        },
+        3.05,
+      );
+      tl.from(".ring-prog", { opacity: 0, duration: 0.3 }, 3.05);
+      tl.to(".ring-glow", { opacity: 1, duration: 0.9 }, 3.4);
+      tl.to(".ring-glow", { scale: 1.08, duration: 1.1, repeat: 1, yoyo: true, ease: "sine.inOut" }, 3.4);
+      tl.from("#g-fill", { width: "0%", duration: 1.1, ease: "power2.out" }, 3.3);
+      tl.call(() => {
+        $("#m-cycles").textContent = "1";
+        $("#m-worked").textContent = "25m worked";
+        $("#g-worked").textContent = "25m";
+        gsap.fromTo("#m-cycles", { scale: 1.35 }, { scale: 1, duration: 0.5, ease: "back.out(2.5)" });
+      }, null, 4.7);
+
+      // start -> pause
+      tl.call(() => {
+        $("#btn-label").textContent = "Pause";
+        $("#side-state").textContent = "running";
+        $("#clock-label").textContent = "Focus ”¢ running";
+        setPaused(true);
+      }, null, 3.8);
+      tl.to("#btn-label", { opacity: 0, y: -6, duration: 0.16, ease: "power2.in" }, 3.8);
+      tl.to("#btn-label", { opacity: 1, y: 0, duration: 0.22, ease: "power2.out" }, 3.98);
+      tl.to(".side-foot .dot", { scale: 1.5, duration: 0.2, yoyo: true, repeat: 1 }, 3.8);
+      tl.to(".side-foot .widget", { borderColor: "rgba(31,138,158,0.45)", duration: 0.4 }, 3.8);
+
+      // metrics
+      tl.from("#p-timer .metric", { y: 14, opacity: 0, duration: 0.5, stagger: 0.08 }, 3.3);
+      tl.from("#p-timer .goal", { y: 14, opacity: 0, duration: 0.5 }, 3.45);
+      tl.from("#p-timer .actions", { y: 14, opacity: 0, duration: 0.5 }, 3.55);
+      tl.from("#p-timer .row", { x: 24, opacity: 0, duration: 0.5, stagger: 0.1 }, 3.4);
+
+      /* ---- SCENE 3: today ---- */
+      tl.addLabel("today", 6.6);
+      tl.to("#p-timer", { opacity: 0, y: -18, duration: 0.4, ease: "power2.in" }, 6.6);
+      tl.fromTo(
+        "#p-today",
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" },
+        6.8,
+      );
+      tl.from("#p-today .row", { x: 28, opacity: 0, duration: 0.5, stagger: 0.1 }, 6.9);
+      tl.from("#p-today .empty", { opacity: 0, y: 10, duration: 0.4 }, 7.3);
+
+      // complete first two tasks
+      tl.to("#p-today .row[data-row='3'] .check svg", { opacity: 1, duration: 0.01 }, 7.55);
+      tl.to("#p-today .row[data-row='3'] .check", { scale: 1.28, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" }, 7.55);
+      tl.call(() => $("#p-today .row[data-row='3']").classList.add("done"), null, 7.6);
+      tl.to("#p-today .row[data-row='3'] .strike", { scaleX: 1, duration: 0.4, ease: "power2.inOut" }, 7.62);
+      tl.to("#p-today .row[data-row='3']", { opacity: 0.6, duration: 0.4 }, 7.7);
+
+      tl.to("#p-today .row[data-row='4'] .check svg", { opacity: 1, duration: 0.01 }, 8.05);
+      tl.to("#p-today .row[data-row='4'] .check", { scale: 1.28, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" }, 8.05);
+      tl.call(() => $("#p-today .row[data-row='4']").classList.add("done"), null, 8.1);
+      tl.to("#p-today .row[data-row='4'] .strike", { scaleX: 1, duration: 0.4, ease: "power2.inOut" }, 8.12);
+      tl.to("#p-today .row[data-row='4']", { opacity: 0.6, duration: 0.4 }, 8.2);
+
+      tl.to("#p-today .row[data-row='5']", { y: -6, duration: 0.3, ease: "power2.inOut" }, 8.25);
+      tl.to("#p-today .row[data-row='6']", { y: -6, duration: 0.3, ease: "power2.inOut" }, 8.25);
+      tl.to("#p-today .row[data-row='5']", { y: 0, duration: 0.35 }, 8.55);
+      tl.to("#p-today .row[data-row='6']", { y: 0, duration: 0.35 }, 8.55);
+
+      // cycle complete: sidebar widget flips to a break
+      tl.call(() => {
+        $("#side-kind").textContent = "Short break";
+        $("#side-state").textContent = "5:00 break";
+        setDot("#a1a1a1");
+        $("#clock-label").textContent = "Break";
+        gsap.to(".side-foot .dot", { scale: 0.6, duration: 0.25, yoyo: true, repeat: 1 });
+      }, null, 8.4);
+      tl.to(".side-foot .widget", { borderColor: "#262626", duration: 0.4 }, 8.4);
+
+      /* ---- SCENE 4: stats ---- */
+      tl.addLabel("stats", 10.1);
+      tl.to("#p-today", { opacity: 0, y: -18, duration: 0.4, ease: "power2.in" }, 10.1);
+      tl.to("#page-title", { innerText: "Stats", duration: 0 }, 10.3);
+      tl.to("#page-desc", {
+        innerText: "Hours & minutes worked over time, daily comparisons, and project breakdowns.",
+        duration: 0,
+      }, 10.3);
+      tl.call(navOn, [3], 10.3);
+      tl.call(() => {
+        $("#page-title").textContent = "Stats";
+        $("#page-desc").textContent =
+          "Hours & minutes worked over time, daily comparisons, and project breakdowns.";
+      }, null, 10.3);
+      tl.fromTo("#p-stats", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.55 }, 10.25);
+      tl.from("#p-stats .kpi", { y: 22, opacity: 0, duration: 0.55, stagger: 0.09 }, 10.35);
+      tl.from("#p-stats .chart-card", { y: 24, opacity: 0, duration: 0.6 }, 10.5);
+      tl.from("#p-stats .streak", { y: 18, opacity: 0, duration: 0.5 }, 10.7);
+
+      // bars grow
+      tl.fromTo(
+        "#bars .col > i",
+        { scaleY: 0 },
+        { scaleY: 1, duration: 0.75, stagger: 0.07, ease: "back.out(1.5)" },
+        10.8,
+      );
+      tl.from("#chart-vals span", { opacity: 0, y: 6, duration: 0.4, stagger: 0.07 }, 11.1);
+      tl.to("#avg i", { scaleX: 1, duration: 0.7, ease: "power2.inOut" }, 11.3);
+      tl.call(() => ($("#avg-label").textContent = `Avg ${fmtHM(avgMin)}`), null, 11.3);
+      tl.to("#bars .col.today > i", { filter: "brightness(1.35)", duration: 0.3, yoyo: true, repeat: 3 }, 11.6);
+
+      // counters
+      const counter = (sel, to, fmt, at = 10.9) =>
+        tl.fromTo(
+          { v: 0 },
+          { v: 0 },
+          {
+            v: to,
+            duration: 0.9,
+            ease: "power2.out",
+            onUpdate() {
+              gsap.set(sel, { innerText: fmt(this.targets()[0].v) });
+            },
+          },
+          at,
+        );
+      counter("#k-total", totalMin, (v) => fmtHM(Math.round(v)));
+      counter("#k-avg", avgMin, (v) => fmtHM(Math.round(v)));
+      counter("#k-cycles", 38, (v) => Math.round(v));
+      counter("#k-streak", 4, (v) => `${Math.round(v)} days`);
+      counter("#card-streak", 4, (v) => Math.round(v));
+      counter("#k-streak2", 4, (v) => Math.round(v), 11.6);
+
+      // streak flame pop
+      tl.fromTo(
+        "#p-stats .streak .flame",
+        { scale: 0.2, rotate: -90 },
+        { scale: 1, rotate: -45, duration: 0.7, ease: "back.out(3)" },
+        11.5,
+      );
+      tl.to("#p-stats .streak .flame", { scale: 1.25, duration: 0.35, yoyo: true, repeat: 1, ease: "sine.inOut" }, 12.2);
+      tl.to("#p-stats .streak", { borderColor: "rgba(239,150,40,0.5)", duration: 0.4 }, 12.2);
+
+      /* ---- SCENE 5: outro ---- */
+      tl.addLabel("outro", 12.8);
+      tl.to("#s-app", { scale: 0.94, opacity: 0, filter: "blur(8px)", duration: 0.55, ease: "power2.in" }, 12.8);
+      tl.set("#s-intro", { opacity: 0 }, 12.8);
+      tl.to("#s-outro", { opacity: 1, duration: 0.3, ease: "none" }, 13.1);
+      tl.from("#s-outro .logo", { scale: 0.55, opacity: 0, filter: "blur(12px)", duration: 0.8 }, 13.2);
+      tl.to("#s-outro .wordmark span", { yPercent: 0, duration: 0.85, ease: "power4.out" }, 13.5);
+      tl.from("#s-outro .tagline", { y: 14, opacity: 0, duration: 0.6 }, 13.9);
+      tl.to("#s-outro", { opacity: 0, scale: 1.06, duration: 0.5, ease: "power2.in" }, 14.7);
+      tl.set({}, {}, 15.2);
+
+      // --- controls ---------------------------------------------------------
+      const ICON_BARS = "M7 4h4v16H7zM13 4h4v16h-4z";
+      const ICON_TRI = "M8 4l12 8-12 8z";
+      const icon = $("#toggle-icon");
+      const setIcon = (d) => (icon.innerHTML = `<path d="${d}" />`);
+      setIcon(ICON_BARS);
+
+      $("#replay").addEventListener("click", () => {
+        tl.restart();
+      });
+      $("#toggle").addEventListener("click", () => {
+        if (tl.paused()) {
+          tl.play();
+          setIcon(ICON_BARS);
+        } else {
+          tl.pause();
+          setIcon(ICON_TRI);
+        }
+      });
+
+      // --- reduced motion: hold on a settled frame, no autoplay -------------
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        tl.pause(5.9);
+        $("#hint").textContent = "Reduced motion — press play to animate";
+        setIcon(ICON_TRI);
+      }
+
+      syncHUD();
+    </script>
+  </body>
+</html>

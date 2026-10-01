@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flano — Pomodoro &amp; Today</title>
+    <meta
+      name="description"
+      content="Flano is an offline Pomodoro timer and today list for the desktop. Focus sessions, recurring tasks, and stats that never leave your machine."
+    />
+    <link rel="icon" type="image/jpeg" href="logo.jpg" />
+    <link rel="preload" href="fonts/manrope-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fonts/manrope-700.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      @font-face {
+        font-family: "Manrope";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("fonts/manrope-400.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "Manrope";
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url("fonts/manrope-600.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "Manrope";
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url("fonts/manrope-700.woff2") format("woff2");
+      }
+
+      @font-face {
+        font-family: "Manrope";
+        font-style: normal;
+        font-weight: 800;
+        font-display: swap;
+        src: url("fonts/manrope-800.woff2") format("woff2");
+      }
+      :root {
+        --background: #0d0d0d;
+        --foreground: #f5f5f5;
+        --primary: #1f8a9e;
+        --primary-strong: #1c7d8e;
+        --primary-foreground: #ffffff;
+        --card: #161616;
+        --muted: #1e1e1e;
+        --muted-foreground: #a1a1a1;
+        --border: #262626;
+        --radius: 0.75rem;
+        --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .wrap {
+        width: 100%;
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      /* Nav */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--border);
+        background: color-mix(in srgb, var(--background) 88%, transparent);
+        backdrop-filter: blur(8px);
+      }
+
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 4rem;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.625rem;
+        font-weight: 700;
+        font-size: 1.0625rem;
+      }
+
+      .brand img {
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 0.5rem;
+        object-fit: cover;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 1.75rem;
+        font-size: 0.875rem;
+        color: var(--muted-foreground);
+      }
+
+      .nav-links a:hover {
+        color: var(--foreground);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        border: 1px solid transparent;
+        transition:
+          opacity 150ms ease,
+          background-color 150ms ease,
+          border-color 150ms ease;
+      }
+
+      .btn-primary {
+        background: var(--primary-strong);
+        color: var(--primary-foreground);
+      }
+
+      .btn-primary:hover {
+        opacity: 0.9;
+      }
+
+      .btn-ghost {
+        border-color: var(--border);
+        background: var(--card);
+        color: var(--foreground);
+      }
+
+      .btn-ghost:hover {
+        border-color: #333333;
+      }
+
+      .btn-sm {
+        padding: 0.5rem 0.9375rem;
+        font-size: 0.875rem;
+      }
+
+      /* Hero */
+      .hero {
+        padding: 5rem 0 4rem;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 3.5rem;
+        align-items: center;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--muted-foreground);
+        border-radius: 999px;
+        padding: 0.3125rem 0.8125rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .eyebrow .dot {
+        width: 0.4375rem;
+        height: 0.4375rem;
+        border-radius: 999px;
+        background: var(--primary);
+      }
+
+      .hero h1 {
+        margin: 1.5rem 0 0;
+        font-size: clamp(2.25rem, 5vw, 3.25rem);
+        font-weight: 800;
+      }
+
+      .hero-sub {
+        margin-top: 1.125rem;
+        color: var(--muted-foreground);
+        font-size: 1.0625rem;
+        max-width: 30rem;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 2rem;
+      }
+
+      .hero-note {
+        margin-top: 1rem;
+        font-size: 0.8125rem;
+        color: var(--muted-foreground);
+      }
+
+      /* Timer ring mock */
+      .mock {
+        border: 1px solid var(--border);
+        background: var(--card);
+        border-radius: calc(var(--radius) + 0.5rem);
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+      }
+
+      .ring {
+        position: relative;
+        width: 208px;
+        height: 208px;
+      }
+
+      .ring svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+
+      .ring-track {
+        fill: none;
+        stroke: var(--muted);
+        stroke-width: 12;
+      }
+
+      .ring-fill {
+        fill: none;
+        stroke: var(--primary);
+        stroke-width: 12;
+        stroke-linecap: round;
+        stroke-dasharray: 490;
+        stroke-dashoffset: 132;
+      }
+
+      .ring-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.125rem;
+      }
+
+      .ring-time {
+        font-size: 2.75rem;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .ring-label {
+        font-size: 0.75rem;
+        color: var(--muted-foreground);
+      }
+
+      .ring-task {
+        margin-top: 0.375rem;
+        border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+        background: color-mix(in srgb, var(--primary) 12%, transparent);
+        color: var(--primary);
+        border-radius: 999px;
+        padding: 0.125rem 0.625rem;
+        font-size: 0.6875rem;
+        font-weight: 600;
+      }
+
+      .mock-row {
+        display: flex;
+        gap: 0.625rem;
+        width: 100%;
+      }
+
+      .mock-btn {
+        flex: 1;
+        border: 1px solid var(--border);
+        background: var(--muted);
+        border-radius: 0.625rem;
+        padding: 0.5rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--foreground);
+        text-align: center;
+      }
+
+      .mock-btn.primary {
+        background: var(--primary-strong);
+        border-color: var(--primary-strong);
+        color: var(--primary-foreground);
+      }
+
+      /* Sections */
+      .section {
+        padding: 4rem 0;
+      }
+
+      .section-head {
+        max-width: 34rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .section-head h2 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+      }
+
+      .section-head p {
+        margin-top: 0.75rem;
+        color: var(--muted-foreground);
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .feature {
+        border: 1px solid var(--border);
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+      }
+
+      .feature-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 0.625rem;
+        background: color-mix(in srgb, var(--primary) 14%, transparent);
+        color: var(--primary);
+        margin-bottom: 1rem;
+      }
+
+      .feature h3 {
+        font-size: 1rem;
+        font-weight: 700;
+      }
+
+      .feature p {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--muted-foreground);
+      }
+
+      /* Offline band */
+      .offline {
+        border: 1px solid var(--border);
+        background: linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--primary) 8%, var(--card)),
+          var(--card)
+        );
+        border-radius: calc(var(--radius) + 0.5rem);
+        padding: 3rem 2rem;
+      }
+
+      .offline-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+      }
+
+      .offline h2 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+      }
+
+      .offline p {
+        margin-top: 0.875rem;
+        color: var(--muted-foreground);
+      }
+
+      .offline-list {
+        display: grid;
+        gap: 0.875rem;
+      }
+
+      .offline-item {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+        font-size: 0.9375rem;
+      }
+
+      .check {
+        flex-shrink: 0;
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0.1875rem;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--primary) 18%, transparent);
+        color: var(--primary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.6875rem;
+        font-weight: 700;
+      }
+
+      .offline-item span:last-child {
+        color: var(--muted-foreground);
+      }
+
+      .offline-item strong {
+        color: var(--foreground);
+        font-weight: 600;
+      }
+
+      /* Download */
+      .download {
+        text-align: center;
+        border: 1px solid var(--border);
+        background: var(--card);
+        border-radius: calc(var(--radius) + 0.5rem);
+        padding: 3rem 2rem;
+      }
+
+      .download h2 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+      }
+
+      .download p {
+        margin: 0.875rem auto 0;
+        color: var(--muted-foreground);
+        max-width: 30rem;
+      }
+
+      .download-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+
+      .version {
+        margin-top: 1.25rem;
+        font-size: 0.8125rem;
+        color: var(--muted-foreground);
+      }
+
+      /* Footer */
+      .footer {
+        border-top: 1px solid var(--border);
+        padding: 2rem 0;
+        margin-top: 4rem;
+      }
+
+      .footer-inner {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.8125rem;
+        color: var(--muted-foreground);
+      }
+
+      @media (max-width: 900px) {
+        .hero-grid,
+        .offline-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .features {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .hero {
+          padding: 3.5rem 0 3rem;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .features {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-links a:not(.btn) {
+          display: none;
+        }
+
+        .offline,
+        .download {
+          padding: 2rem 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="brand" href="#top">
+          <img src="logo.jpg" alt="" />
+          Flano
+        </a>
+        <nav class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#offline">Offline</a>
+          <a class="btn btn-ghost btn-sm" href="#download">Download</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="wrap hero-grid">
+          <div>
+            <span class="eyebrow"><span class="dot"></span> Desktop app &middot; v0.1.0</span>
+            <h1>Pomodoro &amp; Today, in one quiet window.</h1>
+            <p class="hero-sub">
+              Flano pairs a focus timer with the task queue you actually work from today. Everything
+              lives in a local SQLite file on your machine — no account, no sync, no network calls.
+            </p>
+            <div class="hero-actions">
+              <!-- TODO: point at release artifacts once they are published -->
+              <a class="btn btn-primary" href="#download">Download for Windows</a>
+              <a class="btn btn-ghost" href="#features">See features</a>
+            </div>
+            <p class="hero-note">
+              Free, offline-first, and lightweight &mdash; the installer is about 3MB.
+            </p>
+          </div>
+
+          <div class="mock" aria-hidden="true">
+            <div class="ring">
+              <svg viewBox="0 0 200 200">
+                <circle class="ring-track" cx="100" cy="100" r="78" />
+                <circle class="ring-fill" cx="100" cy="100" r="78" />
+              </svg>
+              <div class="ring-center">
+                <div class="ring-time">25:00</div>
+                <div class="ring-label">Focus</div>
+                <div class="ring-task">Write release notes</div>
+              </div>
+            </div>
+            <div class="mock-row">
+              <div class="mock-btn primary">Pause</div>
+              <div class="mock-btn">Reset</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="features">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Built for a day of focused work</h2>
+            <p>
+              The timer, the queue, and the history all read from the same local database, so nothing
+              drifts out of sync.
+            </p>
+          </div>
+
+          <div class="features">
+            <article class="feature">
+              <span class="feature-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7v5l3 2" />
+                </svg>
+              </span>
+              <h3>Focus timer</h3>
+              <p>
+                Work and break sessions alternate automatically, with distinct cues for starting,
+                pausing, and resuming.
+              </p>
+            </article>
+
+            <article class="feature">
+              <span class="feature-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M9 11l3 3 8-8" />
+                  <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9" />
+                </svg>
+              </span>
+              <h3>Today queue</h3>
+              <p>
+                One committed list for the day: add, reorder, complete, and undo. Anything due but
+                not queued is surfaced for you.
+              </p>
+            </article>
+
+            <article class="feature">
+              <span class="feature-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <rect x="3" y="4" width="18" height="17" rx="2" />
+                  <path d="M8 2v4M16 2v4M3 10h18" />
+                </svg>
+              </span>
+              <h3>Recurring tasks</h3>
+              <p>
+                Daily, weekly, or every-N-days rules. Each occurrence is tracked separately, so
+                finishing Tuesday's does not erase Wednesday's.
+              </p>
+            </article>
+
+            <article class="feature">
+              <span class="feature-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                </svg>
+              </span>
+              <h3>Projects &amp; notes</h3>
+              <p>
+                Group tasks into colour-coded projects, each with its own scratchpad that saves as
+                you type.
+              </p>
+            </article>
+
+            <article class="feature">
+              <span class="feature-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+                </svg>
+              </span>
+              <h3>Stats &amp; streaks</h3>
+              <p>
+                Daily focus totals, cycle averages, and a work streak that only counts completed
+                focus sessions.
+              </p>
+            </article>
+
+            <article class="feature">
+              <span class="feature-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01" />
+                </svg>
+              </span>
+              <h3>Shortcut &amp; tray</h3>
+              <p>
+                Start, pause, or skip from the system tray, or bind a global shortcut. The window
+                hides instead of quitting so the timer keeps running.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="offline">
+        <div class="wrap">
+          <div class="offline">
+            <div class="offline-grid">
+              <div>
+                <h2>Your data never leaves your machine</h2>
+                <p>
+                  Flano has no account system and no server component. Sessions, tasks, and settings
+                  live in a single <code>app.db</code> SQLite file you can back up yourself.
+                </p>
+              </div>
+              <div class="offline-list">
+                <div class="offline-item">
+                  <span class="check">&#10003;</span>
+                  <span><strong>No account.</strong> Nothing to sign up for or sign in to.</span>
+                </div>
+                <div class="offline-item">
+                  <span class="check">&#10003;</span>
+                  <span><strong>No tracking.</strong> No analytics, no telemetry, no network calls.</span>
+                </div>
+                <div class="offline-item">
+                  <span class="check">&#10003;</span>
+                  <span><strong>Works offline.</strong> Timers, tasks, and stats run with the cable unplugged.</span>
+                </div>
+                <div class="offline-item">
+                  <span class="check">&#10003;</span>
+                  <span><strong>Tiny footprint.</strong> No runtime to install and no Electron &mdash; about 3MB.</span>
+                </div>
+
+                <div class="offline-item">
+                  <span class="check">&#10003;</span>
+                  <span><strong>Export anytime.</strong> Full JSON backup of every table, importable back.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="download">
+        <div class="wrap">
+          <div class="download">
+            <h2>Start a focus session</h2>
+            <p>
+              Flano is a small native desktop app — no runtime prerequisites beyond Windows itself,
+              and about 3MB to download.
+            </p>
+            <div class="download-actions">
+              <!-- TODO: point at release artifacts once they are published -->
+              <a class="btn btn-primary" href="#download">Download for Windows</a>
+              <a class="btn btn-ghost" href="#features">Read the features</a>
+            </div>
+            <p class="version">Version 0.1.0 &middot; Windows &middot; ~3MB download, ~8MB on disk</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer-inner">
+        <span>Flano &mdash; offline Pomodoro &amp; today list.</span>
+        <span>Local-first. No account, no sync.</span>
+      </div>
+    </footer>
+  </body>
+</html>

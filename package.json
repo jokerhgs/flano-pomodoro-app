@@ -1,0 +1,11 @@
+{
+  "name": "flano",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "pnpm --dir app dev",
+    "build": "pnpm --dir app build",
+    "tauri": "pnpm --dir app tauri",
+    "db:seed": "pnpm --dir app db:seed"
+  }
+}
