@@ -7,5 +7,6 @@
     "build": "pnpm --dir app build",
     "tauri": "pnpm --dir app tauri",
     "db:seed": "pnpm --dir app db:seed"
-  }
+  },
+  "packageManager": "pnpm@10.10.0"
 }
