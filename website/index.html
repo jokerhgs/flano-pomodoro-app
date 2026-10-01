@@ -564,7 +564,7 @@
               lives in a local SQLite file on your machine — no account, no sync, no network calls.
             </p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="https://github.com/jokerhgs/flano-pomodoro-app/releases/latest" target="_blank" rel="noopener noreferrer">Download for Windows</a>
+              <a class="btn btn-primary btn-download" href="https://github.com/jokerhgs/flano-pomodoro-app/releases/download/app-v1.0.0/Flano_1.0.0_x64-setup.exe">Download for Windows</a>
               <a class="btn btn-ghost" href="#features">See features</a>
             </div>
             <p class="hero-note">
@@ -736,7 +736,7 @@
               and about 3MB to download.
             </p>
             <div class="download-actions">
-              <a class="btn btn-primary" href="https://github.com/jokerhgs/flano-pomodoro-app/releases/latest" target="_blank" rel="noopener noreferrer">Download for Windows</a>
+              <a class="btn btn-primary btn-download" href="https://github.com/jokerhgs/flano-pomodoro-app/releases/download/app-v1.0.0/Flano_1.0.0_x64-setup.exe">Download for Windows</a>
               <a class="btn btn-ghost" href="#features">Read the features</a>
             </div>
             <p class="version">Version 1.0.0 &middot; Windows &middot; ~3MB download, ~8MB on disk</p>
@@ -751,5 +751,25 @@
         <span>Local-first. No account, no sync.</span>
       </div>
     </footer>
+
+    <script>
+      (function () {
+        const repo = "jokerhgs/flano-pomodoro-app";
+        fetch(`https://api.github.com/repos/${repo}/releases/latest`)
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (!data || !data.assets) return;
+            const exeAsset =
+              data.assets.find((a) => a.name.endsWith(".exe")) ||
+              data.assets.find((a) => a.name.endsWith(".msi"));
+            if (exeAsset && exeAsset.browser_download_url) {
+              document.querySelectorAll("a.btn-download").forEach((btn) => {
+                btn.href = exeAsset.browser_download_url;
+              });
+            }
+          })
+          .catch(() => {});
+      })();
+    </script>
   </body>
 </html>
